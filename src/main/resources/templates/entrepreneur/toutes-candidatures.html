@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toutes les Candidatures - FreelanceHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .8; }
+        }
+        .badge-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a th:href="@{/entrepreneur/dashboard}" class="flex items-center">
+                        <i class="fas fa-briefcase text-indigo-600 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-800">FreelanceHub</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-gray-600" th:text="${utilisateur.email}">user@example.com</span>
+                    <a th:href="@{/logout}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Déconnexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">
+                <i class="fas fa-users text-indigo-600 mr-3"></i>
+                Toutes les Candidatures
+            </h1>
+            <p class="text-gray-600 mt-2">Vue d'ensemble de toutes les candidatures reçues</p>
+        </div>
+
+        <!-- Liste des candidatures -->
+        <div th:if="${#lists.isEmpty(candidatures)}" class="bg-white rounded-xl shadow-md p-12 text-center">
+            <i class="fas fa-inbox text-gray-400 text-6xl mb-4"></i>
+            <p class="text-gray-700 font-medium text-lg">Aucune candidature reçue</p>
+            <p class="text-gray-600 mt-2">Les freelances pourront bientôt postuler à vos missions</p>
+        </div>
+
+        <div class="space-y-6" th:unless="${#lists.isEmpty(candidatures)}">
+            <div th:each="candidature : ${candidatures}" 
+                 class="bg-white rounded-xl shadow-md hover:shadow-lg transition p-6 border-l-4"
+                 th:classappend="${candidature.statut.name() == 'ACCEPTEE'} ? 'border-green-500' : (${candidature.statut.name() == 'REFUSEE'} ? 'border-red-500' : 'border-yellow-500')">
+                
+                <!-- En-tête avec mission -->
+                <div class="mb-4 pb-4 border-b">
+                    <h3 class="text-xl font-bold text-gray-900" th:text="${candidature.mission.titre}">Mission</h3>
+                    <p class="text-gray-600 text-sm" th:text="${candidature.mission.entreprise.nom}">Entreprise</p>
+                </div>
+
+                <div class="flex items-start space-x-6">
+                    <!-- Photo freelance -->
+                    <div class="flex-shrink-0">
+                        <div th:if="${candidature.freelance.photoProfil != null}" 
+                             class="w-20 h-20 rounded-full overflow-hidden border-4 border-indigo-100">
+                            <img th:src="@{'/uploads/photos/' + ${candidature.freelance.photoProfil}}" 
+                                 alt="Photo" class="w-full h-full object-cover">
+                        </div>
+                        <div th:unless="${candidature.freelance.photoProfil != null}" 
+                             class="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center">
+                            <i class="fas fa-user text-indigo-600 text-3xl"></i>
+                        </div>
+                    </div>
+
+                    <!-- Infos freelance -->
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900" th:text="${candidature.freelance.nomComplet}">Nom</h4>
+                                <p class="text-gray-600 text-sm" th:text="${candidature.freelance.utilisateur.email}">email</p>
+                                <p class="text-gray-600 text-sm mt-2">
+                                    <i class="fas fa-calendar-alt mr-1"></i>
+                                    Postulé le <span th:text="${#temporals.format(candidature.datePostulation, 'dd/MM/yyyy')}">01/01/2024</span>
+                                </p>
+                            </div>
+
+                            <!-- Badge statut -->
+                            <div>
+                                <span th:if="${candidature.statut.name() == 'EN_ATTENTE'}" 
+                                      class="inline-flex items-center bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-bold text-sm border-2 border-yellow-300 badge-pulse">
+                                    <i class="fas fa-clock mr-1"></i> EN ATTENTE
+                                </span>
+                                <span th:if="${candidature.statut.name() == 'ACCEPTEE'}" 
+                                      class="inline-flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full font-bold text-sm border-2 border-green-300">
+                                    <i class="fas fa-check-circle mr-1"></i> ACCEPTÉE
+                                </span>
+                                <span th:if="${candidature.statut.name() == 'REFUSEE'}" 
+                                      class="inline-flex items-center bg-red-100 text-red-800 px-3 py-1 rounded-full font-bold text-sm border-2 border-red-300">
+                                    <i class="fas fa-times-circle mr-1"></i> REFUSÉE
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="mt-4 flex space-x-3">
+                            <a th:href="@{/entrepreneur/mission/{id}/candidatures(id=${candidature.mission.id})}" 
+                               class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-4 py-2 rounded-lg transition">
+                                <i class="fas fa-eye mr-1"></i> Voir détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

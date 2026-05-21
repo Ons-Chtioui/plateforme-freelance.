@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Candidatures à la Mission</title>
+</head>
+<body>
+    <main>
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">
+                <i class="fas fa-users text-indigo-600 mr-3"></i>
+                Candidatures reçues
+            </h1>
+            <p class="text-gray-600 mt-2">Mission : <span class="font-bold" th:text="${mission.titre}">Titre</span></p>
+        </div>
+
+        <!-- Info mission -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Détails de la mission</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <p class="text-sm text-gray-600">Budget</p>
+                    <p class="text-lg font-bold text-green-600">
+                        <i class="fas fa-euro-sign mr-1"></i>
+                        <span th:text="${#numbers.formatDecimal(mission.budget, 0, 'COMMA', 2, 'POINT')}">5000</span> €
+                    </p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Candidatures reçues</p>
+                    <p class="text-lg font-bold text-indigo-600">
+                        <i class="fas fa-paper-plane mr-1"></i>
+                        <span th:text="${#lists.size(candidatures)}">0</span>
+                    </p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Statut</p>
+                    <span th:if="${mission.active}" class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">
+                        <i class="fas fa-check-circle mr-1"></i> Active
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste des candidatures -->
+        <div th:if="${#lists.isEmpty(candidatures)}" class="bg-gray-50 border border-gray-200 rounded-xl p-12 text-center">
+            <i class="fas fa-inbox text-gray-400 text-6xl mb-4"></i>
+            <p class="text-gray-700 font-medium text-lg">Aucune candidature pour cette mission</p>
+            <p class="text-gray-600 mt-2">Les freelances intéressés pourront postuler bientôt</p>
+        </div>
+
+        <div class="space-y-6" th:unless="${#lists.isEmpty(candidatures)}">
+            <div th:each="candidature : ${candidatures}" 
+                 class="bg-white rounded-xl shadow-md hover:shadow-lg transition p-6 border-l-4"
+                 th:classappend="${candidature.statut.name() == 'ACCEPTEE'} ? 'border-green-500' : (${candidature.statut.name() == 'REFUSEE'} ? 'border-red-500' : 'border-yellow-500')">
+                
+                <div class="flex items-start space-x-6">
+                    <!-- Photo du freelance -->
+                    <div class="flex-shrink-0">
+                        <div th:if="${candidature.freelance.photoProfil != null}" 
+                             class="w-24 h-24 rounded-full overflow-hidden border-4 border-indigo-100">
+                            <img th:src="@{'/uploads/photos/' + ${candidature.freelance.photoProfil}}" 
+                                 alt="Photo" class="w-full h-full object-cover">
+                        </div>
+                        <div th:unless="${candidature.freelance.photoProfil != null}" 
+                             class="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center">
+                            <i class="fas fa-user text-indigo-600 text-4xl"></i>
+                        </div>
+                    </div>
+
+                    <!-- Informations du freelance -->
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900" th:text="${candidature.freelance.nomComplet}">Nom Prénom</h3>
+                                <p class="text-gray-600" th:text="${candidature.freelance.utilisateur.email}">email@example.com</p>
+                                <p class="text-gray-600" th:if="${candidature.freelance.telephone}" th:text="${candidature.freelance.telephone}">Téléphone</p>
+                            </div>
+
+                            <!-- Badge statut -->
+                            <div>
+                                <span th:if="${candidature.statut.name() == 'EN_ATTENTE'}" 
+                                      class="inline-flex items-center bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-bold text-sm border-2 border-yellow-300">
+                                    <i class="fas fa-clock mr-2"></i> EN ATTENTE
+                                </span>
+                                <span th:if="${candidature.statut.name() == 'ACCEPTEE'}" 
+                                      class="inline-flex items-center bg-green-100 text-green-800 px-4 py-2 rounded-full font-bold text-sm border-2 border-green-300">
+                                    <i class="fas fa-check-circle mr-2"></i> ACCEPTÉE
+                                </span>
+                                <span th:if="${candidature.statut.name() == 'REFUSEE'}" 
+                                      class="inline-flex items-center bg-red-100 text-red-800 px-4 py-2 rounded-full font-bold text-sm border-2 border-red-300">
+                                    <i class="fas fa-times-circle mr-2"></i> REFUSÉE
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Biographie -->
+                        <div class="mb-4" th:if="${candidature.freelance.biographie != null}">
+                            <p class="text-sm font-medium text-gray-700 mb-1">
+                                <i class="fas fa-user-tie mr-1"></i> À propos
+                            </p>
+                            <p class="text-gray-700" th:text="${candidature.freelance.biographie}">Biographie...</p>
+                        </div>
+
+                        <!-- Compétences du freelance -->
+                        <div class="mb-4" th:if="${#lists.size(candidature.freelance.competences) > 0}">
+                            <p class="text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-code mr-1"></i> Compétences
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span th:each="comp : ${candidature.freelance.competences}" 
+                                      class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
+                                    <i class="fas fa-tag mr-1"></i>
+                                    <span th:text="${comp.nom}">Compétence</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- CV PDF -->
+                        <div class="mb-4" th:if="${candidature.freelance.cvPdf != null}">
+                            <a th:href="@{'/uploads/cv/' + ${candidature.freelance.cvPdf}}" target="_blank"
+                               class="inline-flex items-center bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg font-medium transition">
+                                <i class="fas fa-file-pdf mr-2 text-xl"></i> Télécharger le CV
+                            </a>
+                        </div>
+
+                        <!-- Message de motivation -->
+                        <div th:if="${candidature.messageMotivation != null}" 
+                             class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                            <p class="text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-comment mr-1"></i> Message de motivation
+                            </p>
+                            <p class="text-gray-700 italic" th:text="${candidature.messageMotivation}">Message...</p>
+                        </div>
+
+                        <!-- Date de candidature -->
+                        <p class="text-sm text-gray-600 mb-4">
+                            <i class="fas fa-calendar-alt mr-1"></i>
+                            Candidature envoyée le <span th:text="${#temporals.format(candidature.datePostulation, 'dd/MM/yyyy à HH:mm')}">01/01/2024</span>
+                        </p>
+
+                        <!-- BOUTONS ACCEPTER / REFUSER -->
+                        <div th:if="${candidature.statut.name() == 'EN_ATTENTE'}" class="flex space-x-3">
+                            <form th:action="@{/entrepreneur/candidature/{id}/accepter(id=${candidature.id})}" method="post" class="inline">
+                                <button type="submit" 
+                                        class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-lg transition transform hover:scale-105">
+                                    <i class="fas fa-check mr-2"></i> Accepter
+                                </button>
+                            </form>
+
+                            <form th:action="@{/entrepreneur/candidature/{id}/refuser(id=${candidature.id})}" method="post" class="inline">
+                                <button type="submit" 
+                                        class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg transition transform hover:scale-105">
+                                    <i class="fas fa-times mr-2"></i> Refuser
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Message après décision -->
+                        <div th:if="${candidature.statut.name() == 'ACCEPTEE'}" class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <p class="text-green-800 font-medium">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                Vous avez accepté cette candidature. Vous pouvez maintenant contacter ce freelance.
+                            </p>
+                        </div>
+
+                        <div th:if="${candidature.statut.name() == 'REFUSEE'}" class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <p class="text-red-800 font-medium">
+                                <i class="fas fa-times-circle mr-2"></i>
+                                Vous avez refusé cette candidature.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Retour -->
+        <div class="mt-8">
+            <a th:href="@{/entrepreneur/dashboard}" 
+               class="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium">
+                <i class="fas fa-arrow-left mr-2"></i> Retour au dashboard
+            </a>
+        </div>
+    </main>
+</body>
+</html>

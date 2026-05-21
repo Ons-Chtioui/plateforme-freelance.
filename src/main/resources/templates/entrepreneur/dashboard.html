@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Dashboard Entrepreneur</title>
+</head>
+<body>
+    <main>
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">
+                <i class="fas fa-chart-line text-indigo-600 mr-3"></i>
+                Dashboard Entrepreneur
+            </h1>
+            <p class="text-gray-600 mt-2">Gérez vos missions et recrutez les meilleurs talents</p>
+        </div>
+
+        <!-- Cartes statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-indigo-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Missions publiées</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1" th:text="${#lists.size(missions)}">0</p>
+                    </div>
+                    <i class="fas fa-tasks text-4xl text-indigo-500"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Mon entreprise</p>
+                        <p class="text-xl font-bold text-gray-900 mt-1" th:text="${entreprise.nom}">Nom</p>
+                    </div>
+                    <i class="fas fa-building text-4xl text-green-500"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Missions actives</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1" th:text="${#lists.size(missions.?[active == true])}">0</p>
+                    </div>
+                    <i class="fas fa-check-circle text-4xl text-yellow-500"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations entreprise -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">
+                    <i class="fas fa-building text-indigo-600 mr-2"></i>
+                    Mon Entreprise
+                </h2>
+                <a th:href="@{/entrepreneur/entreprise/modifier}" 
+                   class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-edit mr-2"></i> Modifier
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Nom de l'entreprise</p>
+                    <p class="text-lg font-bold text-gray-900" th:text="${entreprise.nom}">Nom</p>
+                </div>
+
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Secteur d'activité</p>
+                    <p class="text-lg font-bold text-gray-900" th:text="${entreprise.secteurActivite}">Secteur</p>
+                </div>
+
+                <div th:if="${entreprise.siteWeb != null}">
+                    <p class="text-sm text-gray-600 mb-1">Site web</p>
+                    <a th:href="${entreprise.siteWeb}" target="_blank" 
+                       class="text-indigo-600 hover:text-indigo-800 font-medium">
+                        <i class="fas fa-external-link-alt mr-1"></i>
+                        <span th:text="${entreprise.siteWeb}">www.example.com</span>
+                    </a>
+                </div>
+
+                <div th:if="${entreprise.description != null}" class="md:col-span-2">
+                    <p class="text-sm text-gray-600 mb-1">Description</p>
+                    <p class="text-gray-700" th:text="${entreprise.description}">Description...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <a th:href="@{/entrepreneur/missions/ajouter}" 
+               class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg p-8 hover:shadow-xl transition group text-white">
+                <i class="fas fa-plus-circle text-5xl mb-4"></i>
+                <h3 class="text-2xl font-bold">Publier une mission</h3>
+                <p class="mt-2 opacity-90">Créez une nouvelle mission et trouvez le freelance idéal</p>
+            </a>
+
+            <a th:href="@{/entrepreneur/candidatures}" 
+               class="bg-gradient-to-r from-green-500 to-teal-600 rounded-xl shadow-lg p-8 hover:shadow-xl transition group text-white">
+                <i class="fas fa-users text-5xl mb-4"></i>
+                <h3 class="text-2xl font-bold">Voir les candidatures</h3>
+                <p class="mt-2 opacity-90">Consultez les profils des freelances qui ont postulé</p>
+            </a>
+        </div>
+
+        <!-- Liste des missions -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">
+                    <i class="fas fa-list text-indigo-600 mr-2"></i>
+                    Mes Missions
+                </h2>
+                <a th:href="@{/entrepreneur/missions}" class="text-indigo-600 hover:text-indigo-800 font-medium">
+                    Voir tout <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+            <div th:if="${#lists.isEmpty(missions)}" class="text-center py-12">
+                <i class="fas fa-inbox text-gray-400 text-6xl mb-4"></i>
+                <p class="text-gray-600 font-medium">Vous n'avez publié aucune mission</p>
+                <a th:href="@{/entrepreneur/missions/ajouter}" 
+                   class="inline-block mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg">
+                    <i class="fas fa-plus mr-2"></i> Créer ma première mission
+                </a>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(missions)}" class="space-y-4">
+                <div th:each="mission : ${missions}" 
+                     class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+                     th:classappend="${mission.active} ? 'bg-white' : 'bg-gray-50'">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-gray-900" th:text="${mission.titre}">Titre</h3>
+                            <p class="text-gray-600 text-sm mt-1 line-clamp-2" th:text="${mission.description}">Description...</p>
+                            
+                            <div class="flex items-center space-x-4 mt-3">
+                                <span class="text-green-600 font-bold">
+                                    <i class="fas fa-euro-sign mr-1"></i>
+                                    <span th:text="${#numbers.formatDecimal(mission.budget, 0, 'COMMA', 2, 'POINT')}">5000</span> €
+                                </span>
+                                
+                                <span class="text-gray-600 text-sm">
+                                    <i class="fas fa-paper-plane mr-1"></i>
+                                    <span th:text="${#lists.size(mission.candidatures)}">0</span> candidature(s)
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col space-y-2 ml-4">
+                            <span th:if="${mission.active}" 
+                                  class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">
+                                <i class="fas fa-check-circle mr-1"></i> Active
+                            </span>
+                            <span th:unless="${mission.active}" 
+                                  class="bg-gray-300 text-gray-700 px-3 py-1 rounded-full text-xs font-bold">
+                                <i class="fas fa-times-circle mr-1"></i> Inactive
+                            </span>
+
+                            <a th:href="@{/entrepreneur/mission/{id}/candidatures(id=${mission.id})}" 
+                               class="bg-indigo-600 hover:bg-indigo-700 text-white text-center px-4 py-2 rounded-lg text-sm transition">
+                                <i class="fas fa-users mr-1"></i> Candidats
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

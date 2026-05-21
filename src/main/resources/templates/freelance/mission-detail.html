@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail Mission - FreelanceHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar simplifiée -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a th:href="@{/freelance/missions}" class="text-indigo-600 hover:text-indigo-800">
+                        <i class="fas fa-arrow-left mr-2"></i> Retour aux missions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-4" th:text="${mission.titre}">Titre Mission</h1>
+            
+            <!-- Entreprise -->
+            <div class="flex items-center text-gray-600 mb-6">
+                <i class="fas fa-building mr-2 text-indigo-600"></i>
+                <span th:text="${mission.entreprise.nom}">Nom Entreprise</span>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-3">Description</h2>
+                <p class="text-gray-700 whitespace-pre-line" th:text="${mission.description}">Description...</p>
+            </div>
+
+            <!-- Budget -->
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-3">Budget</h2>
+                <div class="flex items-center text-green-600 font-bold text-2xl">
+                    <i class="fas fa-euro-sign mr-2"></i>
+                    <span th:text="${#numbers.formatDecimal(mission.budget, 0, 'COMMA', 2, 'POINT')}">5000</span>
+                    <span class="text-sm text-gray-600 ml-1">€</span>
+                </div>
+            </div>
+
+            <!-- Compétences -->
+            <div class="mb-8" th:if="${#lists.size(mission.competences) > 0}">
+                <h2 class="text-xl font-bold text-gray-900 mb-3">Compétences requises</h2>
+                <div class="flex flex-wrap gap-2">
+                    <span th:each="comp : ${mission.competences}" 
+                          class="bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full font-medium">
+                        <i class="fas fa-tag mr-1"></i>
+                        <span th:text="${comp.nom}">Compétence</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Action -->
+            <div class="border-t pt-6">
+                <div th:if="${dejaPostule}">
+                    <button disabled class="w-full bg-gray-300 text-gray-600 px-6 py-4 rounded-lg cursor-not-allowed text-lg font-bold">
+                        <i class="fas fa-check-circle mr-2"></i> Vous avez déjà postulé
+                    </button>
+                </div>
+
+                <div th:unless="${dejaPostule}">
+                    <form th:action="@{/freelance/postuler/{id}(id=${mission.id})}" method="post">
+                        <textarea name="messageMotivation" rows="4" 
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 mb-4"
+                                  placeholder="Message de motivation (optionnel)"></textarea>
+                        
+                        <button type="submit" 
+                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-4 rounded-lg transition transform hover:scale-105 shadow-lg text-lg font-bold">
+                            <i class="fas fa-paper-plane mr-2"></i> Postuler à cette mission
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

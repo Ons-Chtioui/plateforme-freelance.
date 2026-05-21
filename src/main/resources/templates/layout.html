@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout (title, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:replace="${title}">FreelanceHub</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .8; }
+        }
+        .badge-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Navbar -->
+<nav class="bg-white shadow-lg" th:if="${utilisateur != null}">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <a href="#" class="flex items-center">
+                    <i class="fas fa-briefcase text-indigo-600 text-2xl mr-2"></i>
+                    <span class="text-xl font-bold text-gray-800">FreelanceHub</span>
+                </a>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <!-- Menu Admin -->
+                <div th:if="${utilisateur.role.name() == 'ADMIN'}">
+                    <a th:href="@{/admin/dashboard}" class="text-gray-700 hover:text-indigo-600 px-3 py-2">
+                        <i class="fas fa-chart-line mr-1"></i> Dashboard
+                    </a>
+                    <a th:href="@{/admin/utilisateurs}" class="text-gray-700 hover:text-indigo-600 px-3 py-2">
+                        <i class="fas fa-users mr-1"></i> Utilisateurs
+                    </a>
+                    <a th:href="@{/admin/entreprises}" class="text-gray-700 hover:text-indigo-600 px-3 py-2">
+                        <i class="fas fa-building mr-1"></i> Entreprises
+                    </a>
+                    <a th:href="@{/admin/missions}" class="text-gray-700 hover:text-indigo-600 px-3 py-2">
+                        <i class="fas fa-tasks mr-1"></i> Missions
+                    </a>
+                    <a th:href="@{/admin/competences}" class="text-gray-700 hover:text-indigo-600 px-3 py-2">
+                        <i class="fas fa-code mr-1"></i> Compétences
+                    </a>
+                </div>
+
+                <!-- Menu Freelance -->
+                <div th:if="${utilisateur.role.name() == 'FREELANCE'}">
+                    <a th:href="@{/freelance/dashboard}" class="text-gray-700 hover:text-indigo-600 px-3 py-2">
+                        <i class="fas fa-home mr-1"></i> Accueil
+                    </a>
+                    <a th:href="@{/freelance/missions}" class="text-gray-700 hover:text-indigo-600 px-3 py-2">
+                        <i class="fas fa-search mr-1"></i> Missions
+                    </a>
+                    <a th:href="@{/freelance/mes-candidatures}" class="text-gray-700 hover:text-indigo-600 px-3 py-2">
+                        <i class="fas fa-paper-plane mr-1"></i> Mes Candidatures
+                    </a>
+                    <a th:href="@{/freelance/profil}" class="text-gray-700 hover:text-indigo-600 px-3 py-2">
+                        <i class="fas fa-user mr-1"></i> Profil
+                    </a>
+                </div>
+
+                <!-- Menu Entrepreneur -->
+                <div th:if="${utilisateur.role.name() == 'ENTREPRENEUR'}">
+                    <a th:href="@{/entrepreneur/dashboard}" class="text-gray-700 hover:text-indigo-600 px-3 py-2">
+                        <i class="fas fa-home mr-1"></i> Accueil
+                    </a>
+                    <a th:href="@{/entrepreneur/missions}" class="text-gray-700 hover:text-indigo-600 px-3 py-2">
+                        <i class="fas fa-tasks mr-1"></i> Mes Missions
+                    </a>
+                    <a th:href="@{/entrepreneur/candidatures}" class="text-gray-700 hover:text-indigo-600 px-3 py-2">
+                        <i class="fas fa-users mr-1"></i> Candidatures
+                    </a>
+                </div>
+
+                <!-- User info & logout -->
+                <div class="flex items-center space-x-3 border-l pl-4">
+                    <span class="text-gray-600" th:text="${utilisateur.email}">user@example.com</span>
+                    <a th:href="@{/logout}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Déconnexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Flash Messages -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+    <div th:if="${success}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <i class="fas fa-check-circle mr-2"></i>
+        <span th:text="${success}"></span>
+    </div>
+
+    <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <i class="fas fa-exclamation-circle mr-2"></i>
+        <span th:text="${error}"></span>
+    </div>
+</div>
+
+<!-- Main Content -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <th:block th:replace="${content}"></th:block>
+</main>
+
+<!-- Footer -->
+<footer class="bg-white border-t mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <p class="text-center text-gray-600">
+            © 2024 FreelanceHub - Plateforme de mise en relation Freelances & Entrepreneurs
+        </p>
+    </div>
+</footer>
+
+</body>
+</html>

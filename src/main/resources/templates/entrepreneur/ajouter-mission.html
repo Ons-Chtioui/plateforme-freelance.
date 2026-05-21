@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Publier une Mission</title>
+</head>
+<body>
+    <main>
+        <div class="max-w-4xl mx-auto">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">
+                    <i class="fas fa-plus-circle text-indigo-600 mr-3"></i>
+                    Publier une Mission
+                </h1>
+                <p class="text-gray-600 mt-2">Créez une nouvelle mission pour recruter des freelances talentueux</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <form th:action="@{/entrepreneur/missions/ajouter}" method="post" class="space-y-6">
+                    
+                    <!-- Titre de la mission -->
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">
+                            <i class="fas fa-heading mr-2 text-indigo-600"></i>
+                            Titre de la mission *
+                        </label>
+                        <input type="text" name="titre" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                               placeholder="Ex: Développement d'une application mobile">
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">
+                            <i class="fas fa-align-left mr-2 text-indigo-600"></i>
+                            Description détaillée *
+                        </label>
+                        <textarea name="description" rows="8" required
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                  placeholder="Décrivez en détail la mission, les objectifs, les livrables attendus..."></textarea>
+                        <p class="text-sm text-gray-600 mt-2">
+                            <i class="fas fa-lightbulb mr-1"></i>
+                            Soyez précis pour attirer les bons profils : technologies utilisées, durée estimée, mode de travail...
+                        </p>
+                    </div>
+
+                    <!-- Budget -->
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">
+                            <i class="fas fa-euro-sign mr-2 text-green-600"></i>
+                            Budget (en €) *
+                        </label>
+                        <input type="number" name="budget" step="0.01" min="0" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                               placeholder="5000.00">
+                        <p class="text-sm text-gray-600 mt-2">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Budget total pour cette mission
+                        </p>
+                    </div>
+
+                    <!-- SÉLECTION MULTIPLE DES COMPÉTENCES -->
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-3">
+                            <i class="fas fa-code mr-2 text-indigo-600"></i>
+                            Compétences requises *
+                        </label>
+                        <p class="text-sm text-gray-600 mb-3">
+                            Sélectionnez toutes les compétences nécessaires pour cette mission. Cela permettra un meilleur matching avec les freelances.
+                        </p>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-80 overflow-y-auto p-4 border-2 border-indigo-200 rounded-lg bg-indigo-50">
+                            <label th:each="comp : ${competences}" 
+                                   class="flex items-center space-x-2 cursor-pointer bg-white p-3 rounded-lg hover:bg-indigo-100 transition">
+                                <input type="checkbox" name="competenceIds" th:value="${comp.id}"
+                                       class="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <span class="text-gray-800 text-sm font-medium" th:text="${comp.nom}">Compétence</span>
+                            </label>
+                        </div>
+                        
+                        <p class="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            <strong>Astuce :</strong> Plus vous sélectionnez de compétences pertinentes, plus votre mission sera visible par les bons freelances !
+                        </p>
+                    </div>
+
+                    <!-- Info entreprise (automatique) -->
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <p class="text-green-800">
+                            <i class="fas fa-building mr-2"></i>
+                            <strong>Votre entreprise :</strong> Cette mission sera automatiquement liée à votre entreprise.
+                        </p>
+                    </div>
+
+                    <!-- Boutons -->
+                    <div class="flex justify-end space-x-3 pt-4 border-t">
+                        <a th:href="@{/entrepreneur/dashboard}" 
+                           class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold px-6 py-3 rounded-lg transition">
+                            <i class="fas fa-times mr-2"></i> Annuler
+                        </a>
+                        <button type="submit" 
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3 rounded-lg transition transform hover:scale-105">
+                            <i class="fas fa-rocket mr-2"></i> Publier la mission
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Freelances - FreelanceHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a th:href="@{/admin/dashboard}" class="flex items-center">
+                        <i class="fas fa-briefcase text-indigo-600 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-800">FreelanceHub Admin</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-gray-600" th:text="${utilisateur.email}">admin@example.com</span>
+                    <a th:href="@{/logout}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Déconnexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">
+                <i class="fas fa-laptop-code text-blue-600 mr-3"></i>
+                Profils Freelances
+            </h1>
+            <p class="text-gray-600 mt-2">Consultez tous les profils des freelances inscrits</p>
+        </div>
+
+        <!-- Liste freelances -->
+        <div th:if="${#lists.isEmpty(freelances)}" class="bg-white rounded-xl shadow-md p-12 text-center">
+            <i class="fas fa-inbox text-gray-400 text-6xl mb-4"></i>
+            <p class="text-gray-700 font-medium">Aucun freelance inscrit</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" th:unless="${#lists.isEmpty(freelances)}">
+            <div th:each="profil : ${freelances}" 
+                 class="bg-white rounded-xl shadow-md hover:shadow-lg transition p-6">
+                
+                <!-- Photo -->
+                <div class="text-center mb-4">
+                    <div th:if="${profil.photoProfil != null}" 
+                         class="w-24 h-24 mx-auto rounded-full overflow-hidden border-4 border-indigo-100">
+                        <img th:src="@{'/uploads/photos/' + ${profil.photoProfil}}" 
+                             alt="Photo" class="w-full h-full object-cover">
+                    </div>
+                    <div th:unless="${profil.photoProfil != null}" 
+                         class="w-24 h-24 mx-auto rounded-full bg-indigo-100 flex items-center justify-center">
+                        <i class="fas fa-user text-indigo-600 text-4xl"></i>
+                    </div>
+                </div>
+
+                <!-- Infos -->
+                <h3 class="text-lg font-bold text-gray-900 text-center mb-1" th:text="${profil.nomComplet}">Nom Prénom</h3>
+                <p class="text-gray-600 text-sm text-center mb-4" th:text="${profil.utilisateur.email}">email@example.com</p>
+
+                <!-- Téléphone -->
+                <p class="text-gray-600 text-sm text-center mb-3" th:if="${profil.telephone != null}">
+                    <i class="fas fa-phone mr-1"></i>
+                    <span th:text="${profil.telephone}">Téléphone</span>
+                </p>
+
+                <!-- Biographie -->
+                <p class="text-gray-700 text-sm mb-4 line-clamp-3" th:if="${profil.biographie != null}" 
+                   th:text="${profil.biographie}">Bio...</p>
+
+                <!-- Compétences -->
+                <div class="mb-4" th:if="${#lists.size(profil.competences) > 0}">
+                    <p class="text-xs font-medium text-gray-600 mb-2">Compétences :</p>
+                    <div class="flex flex-wrap gap-1">
+                        <span th:each="comp : ${profil.competences}" 
+                              class="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-xs">
+                            <span th:text="${comp.nom}">Compétence</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- CV -->
+                <div class="text-center pt-4 border-t">
+                    <a th:if="${profil.cvPdf != null}" 
+                       th:href="@{'/uploads/cv/' + ${profil.cvPdf}}" target="_blank"
+                       class="inline-flex items-center bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg text-sm transition">
+                        <i class="fas fa-file-pdf mr-2"></i> Voir le CV
+                    </a>
+                    <span th:unless="${profil.cvPdf != null}" class="text-gray-400 text-sm">
+                        <i class="fas fa-file-pdf mr-1"></i> Pas de CV
+                    </span>
+                </div>
+
+                <!-- Stats -->
+                <div class="mt-4 pt-4 border-t text-center">
+                    <p class="text-sm text-gray-600">
+                        <i class="fas fa-paper-plane mr-1"></i>
+                        <span th:text="${#lists.size(profil.candidatures)}">0</span> candidature(s)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 text-center">
+            <p class="text-gray-600">
+                <i class="fas fa-info-circle mr-2"></i>
+                Total : <span class="font-bold" th:text="${#lists.size(freelances)}">0</span> freelance(s)
+            </p>
+        </div>
+    </main>
+</body>
+</html>

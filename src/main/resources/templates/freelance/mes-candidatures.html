@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Mes Candidatures</title>
+</head>
+<body>
+    <main>
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">
+                <i class="fas fa-paper-plane text-indigo-600 mr-3"></i>
+                Mes Candidatures
+            </h1>
+            <p class="text-gray-600 mt-2">Suivez l'état de vos candidatures</p>
+        </div>
+
+        <!-- Liste des candidatures -->
+        <div th:if="${#lists.isEmpty(candidatures)}" class="bg-gray-50 border border-gray-200 rounded-xl p-8 text-center">
+            <i class="fas fa-inbox text-gray-400 text-5xl mb-4"></i>
+            <p class="text-gray-700 font-medium">Vous n'avez envoyé aucune candidature</p>
+            <p class="text-gray-600 mt-2">Parcourez les missions disponibles et postulez !</p>
+            <a th:href="@{/freelance/missions}" class="inline-block mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg">
+                <i class="fas fa-search mr-2"></i> Voir les missions
+            </a>
+        </div>
+
+        <div class="space-y-6" th:unless="${#lists.isEmpty(candidatures)}">
+            <div th:each="candidature : ${candidatures}" class="bg-white rounded-xl shadow-md hover:shadow-lg transition p-6 border-l-4"
+                 th:classappend="${candidature.statut.name() == 'ACCEPTEE'} ? 'border-green-500' : (${candidature.statut.name() == 'REFUSEE'} ? 'border-red-500' : 'border-yellow-500')">
+                
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <!-- Titre de la mission -->
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2" th:text="${candidature.mission.titre}">Titre Mission</h3>
+                        
+                        <!-- Entreprise -->
+                        <div class="flex items-center text-gray-600 mb-3">
+                            <i class="fas fa-building mr-2 text-indigo-600"></i>
+                            <span th:text="${candidature.mission.entreprise.nom}">Nom Entreprise</span>
+                        </div>
+
+                        <!-- Description mission -->
+                        <p class="text-gray-700 mb-4 line-clamp-2" th:text="${candidature.mission.description}">Description...</p>
+
+                        <!-- Budget -->
+                        <div class="flex items-center text-green-600 font-bold text-lg mb-3">
+                            <i class="fas fa-euro-sign mr-2"></i>
+                            <span th:text="${#numbers.formatDecimal(candidature.mission.budget, 0, 'COMMA', 2, 'POINT')}">5000</span>
+                            <span class="text-sm text-gray-600 ml-1">€</span>
+                        </div>
+
+                        <!-- Date de postulation -->
+                        <p class="text-sm text-gray-600">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            Postulé le <span th:text="${#temporals.format(candidature.datePostulation, 'dd/MM/yyyy à HH:mm')}">01/01/2024</span>
+                        </p>
+                    </div>
+
+                    <!-- Badge Statut -->
+                    <div class="ml-6">
+                        <!-- EN_ATTENTE - Orange -->
+                        <span th:if="${candidature.statut.name() == 'EN_ATTENTE'}" 
+                              class="inline-flex items-center bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-bold text-sm border-2 border-yellow-300 badge-pulse">
+                            <i class="fas fa-clock mr-2"></i> EN ATTENTE
+                        </span>
+
+                        <!-- ACCEPTEE - Vert -->
+                        <span th:if="${candidature.statut.name() == 'ACCEPTEE'}" 
+                              class="inline-flex items-center bg-green-100 text-green-800 px-4 py-2 rounded-full font-bold text-sm border-2 border-green-300">
+                            <i class="fas fa-check-circle mr-2"></i> ACCEPTÉE
+                        </span>
+
+                        <!-- REFUSEE - Rouge -->
+                        <span th:if="${candidature.statut.name() == 'REFUSEE'}" 
+                              class="inline-flex items-center bg-red-100 text-red-800 px-4 py-2 rounded-full font-bold text-sm border-2 border-red-300">
+                            <i class="fas fa-times-circle mr-2"></i> REFUSÉE
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Message de motivation si présent -->
+                <div th:if="${candidature.messageMotivation != null}" class="mt-4 pt-4 border-t border-gray-200">
+                    <p class="text-sm font-medium text-gray-700 mb-1">Votre message de motivation :</p>
+                    <p class="text-gray-600 italic" th:text="${candidature.messageMotivation}">Message...</p>
+                </div>
+
+                <!-- Actions selon le statut -->
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <div th:if="${candidature.statut.name() == 'ACCEPTEE'}" class="bg-green-50 p-4 rounded-lg">
+                        <p class="text-green-800 font-medium">
+                            <i class="fas fa-thumbs-up mr-2"></i>
+                            Félicitations ! L'entrepreneur a accepté votre candidature.
+                        </p>
+                        <p class="text-green-700 text-sm mt-2">
+                            Vous pouvez maintenant prendre contact avec l'entreprise pour démarrer la mission.
+                        </p>
+                    </div>
+
+                    <div th:if="${candidature.statut.name() == 'REFUSEE'}" class="bg-red-50 p-4 rounded-lg">
+                        <p class="text-red-800 font-medium">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Votre candidature n'a pas été retenue pour cette mission.
+                        </p>
+                        <p class="text-red-700 text-sm mt-2">
+                            Ne vous découragez pas ! Continuez à postuler à d'autres missions.
+                        </p>
+                    </div>
+
+                    <div th:if="${candidature.statut.name() == 'EN_ATTENTE'}" class="bg-yellow-50 p-4 rounded-lg">
+                        <p class="text-yellow-800 font-medium">
+                            <i class="fas fa-hourglass-half mr-2"></i>
+                            Votre candidature est en cours d'examen.
+                        </p>
+                        <p class="text-yellow-700 text-sm mt-2">
+                            L'entrepreneur étudie votre profil. Vous serez notifié de sa décision.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques en bas -->
+        <div th:unless="${#lists.isEmpty(candidatures)}" class="mt-8 grid grid-cols-3 gap-4">
+            <div class="bg-yellow-50 rounded-xl p-4 text-center border-2 border-yellow-200">
+                <p class="text-3xl font-bold text-yellow-800" th:text="${#lists.size(candidatures.?[statut.name() == 'EN_ATTENTE'])}">0</p>
+                <p class="text-sm text-yellow-700 mt-1">En attente</p>
+            </div>
+            
+            <div class="bg-green-50 rounded-xl p-4 text-center border-2 border-green-200">
+                <p class="text-3xl font-bold text-green-800" th:text="${#lists.size(candidatures.?[statut.name() == 'ACCEPTEE'])}">0</p>
+                <p class="text-sm text-green-700 mt-1">Acceptées</p>
+            </div>
+            
+            <div class="bg-red-50 rounded-xl p-4 text-center border-2 border-red-200">
+                <p class="text-3xl font-bold text-red-800" th:text="${#lists.size(candidatures.?[statut.name() == 'REFUSEE'])}">0</p>
+                <p class="text-sm text-red-700 mt-1">Refusées</p>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

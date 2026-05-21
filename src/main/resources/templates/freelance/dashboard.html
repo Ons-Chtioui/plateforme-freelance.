@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Dashboard Freelance</title>
+</head>
+<body>
+    <main>
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">
+                <i class="fas fa-home text-indigo-600 mr-3"></i>
+                Bienvenue, <span th:text="${profil.prenom}">Prénom</span> !
+            </h1>
+            <p class="text-gray-600 mt-2">Tableau de bord Freelance</p>
+        </div>
+
+        <!-- Cartes de statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Missions disponibles -->
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-indigo-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Missions disponibles</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1">
+                            <span th:text="${#lists.size(profil.competences) > 0 ? '...' : '0'}">...</span>
+                        </p>
+                    </div>
+                    <i class="fas fa-briefcase text-4xl text-indigo-500"></i>
+                </div>
+                <a th:href="@{/freelance/missions}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium mt-4 inline-block">
+                    Voir les missions <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+            <!-- Candidatures en attente -->
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Candidatures en attente</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1">
+                            <span th:text="${#lists.size(profil.candidatures)}">0</span>
+                        </p>
+                    </div>
+                    <i class="fas fa-clock text-4xl text-yellow-500"></i>
+                </div>
+                <a th:href="@{/freelance/mes-candidatures}" class="text-yellow-600 hover:text-yellow-800 text-sm font-medium mt-4 inline-block">
+                    Suivre mes candidatures <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+            <!-- Compétences -->
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Mes compétences</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1">
+                            <span th:text="${#lists.size(profil.competences)}">0</span>
+                        </p>
+                    </div>
+                    <i class="fas fa-code text-4xl text-green-500"></i>
+                </div>
+                <a th:href="@{/freelance/profil}" class="text-green-600 hover:text-green-800 text-sm font-medium mt-4 inline-block">
+                    Gérer mon profil <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Aperçu du profil -->
+        <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                <i class="fas fa-user-circle text-indigo-600 mr-2"></i>
+                Mon Profil
+            </h2>
+            
+            <div class="flex items-start space-x-6">
+                <!-- Photo de profil -->
+                <div class="flex-shrink-0">
+                    <div th:if="${profil.photoProfil != null}" class="w-32 h-32 rounded-full overflow-hidden border-4 border-indigo-100">
+                        <img th:src="@{'/uploads/photos/' + ${profil.photoProfil}}" alt="Photo" class="w-full h-full object-cover">
+                    </div>
+                    <div th:unless="${profil.photoProfil != null}" class="w-32 h-32 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <i class="fas fa-user text-indigo-600 text-5xl"></i>
+                    </div>
+                </div>
+
+                <!-- Informations -->
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-gray-900" th:text="${profil.nomComplet}">Nom Prénom</h3>
+                    <p class="text-gray-600 mt-1" th:text="${profil.utilisateur.email}">email@example.com</p>
+                    <p class="text-gray-600" th:if="${profil.telephone}" th:text="${profil.telephone}">Téléphone</p>
+                    
+                    <div class="mt-4">
+                        <p class="text-gray-700" th:if="${profil.biographie}" th:text="${profil.biographie}">Biographie...</p>
+                        <p class="text-gray-400 italic" th:unless="${profil.biographie}">Aucune biographie</p>
+                    </div>
+
+                    <!-- Compétences -->
+                    <div class="mt-4" th:if="${#lists.size(profil.competences) > 0}">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Compétences :</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span th:each="comp : ${profil.competences}" 
+                                  class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
+                                <i class="fas fa-tag mr-1"></i>
+                                <span th:text="${comp.nom}">Compétence</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- CV -->
+                    <div class="mt-4" th:if="${profil.cvPdf != null}">
+                        <a th:href="@{'/uploads/cv/' + ${profil.cvPdf}}" target="_blank"
+                           class="inline-flex items-center text-red-600 hover:text-red-800 font-medium">
+                            <i class="fas fa-file-pdf mr-2"></i> Voir mon CV
+                        </a>
+                    </div>
+
+                    <a th:href="@{/freelance/profil}" 
+                       class="inline-block mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition">
+                        <i class="fas fa-edit mr-2"></i> Modifier mon profil
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accès rapide -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <a th:href="@{/freelance/missions}" class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition group">
+                <i class="fas fa-search text-4xl text-indigo-600 mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-900 group-hover:text-indigo-600">Trouver des missions</h3>
+                <p class="text-gray-600 mt-2">Découvrez les missions qui correspondent à vos compétences</p>
+            </a>
+
+            <a th:href="@{/freelance/mes-candidatures}" class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition group">
+                <i class="fas fa-paper-plane text-4xl text-yellow-600 mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-900 group-hover:text-yellow-600">Mes candidatures</h3>
+                <p class="text-gray-600 mt-2">Suivez l'état de vos candidatures en temps réel</p>
+            </a>
+        </div>
+    </main>
+</body>
+</html>

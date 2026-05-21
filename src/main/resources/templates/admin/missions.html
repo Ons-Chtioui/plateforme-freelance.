@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Missions - FreelanceHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a th:href="@{/admin/dashboard}" class="flex items-center">
+                        <i class="fas fa-briefcase text-indigo-600 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-800">FreelanceHub Admin</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-gray-600" th:text="${utilisateur.email}">admin@example.com</span>
+                    <a th:href="@{/logout}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Déconnexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">
+                <i class="fas fa-tasks text-yellow-600 mr-3"></i>
+                Gestion des Missions
+            </h1>
+            <p class="text-gray-600 mt-2">Modérez et gérez toutes les missions de la plateforme</p>
+        </div>
+
+        <!-- Liste missions -->
+        <div th:if="${#lists.isEmpty(missions)}" class="bg-white rounded-xl shadow-md p-12 text-center">
+            <i class="fas fa-inbox text-gray-400 text-6xl mb-4"></i>
+            <p class="text-gray-700 font-medium">Aucune mission active</p>
+        </div>
+
+        <div class="space-y-4" th:unless="${#lists.isEmpty(missions)}">
+            <div th:each="mission : ${missions}" 
+                 class="bg-white rounded-xl shadow-md hover:shadow-lg transition p-6">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900" th:text="${mission.titre}">Titre Mission</h3>
+                                <p class="text-gray-600 text-sm mt-1">
+                                    <i class="fas fa-building mr-1"></i>
+                                    <span th:text="${mission.entreprise.nom}">Entreprise</span>
+                                </p>
+                            </div>
+                            <span th:if="${mission.active}" 
+                                  class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">
+                                <i class="fas fa-check-circle mr-1"></i> Active
+                            </span>
+                            <span th:unless="${mission.active}" 
+                                  class="bg-gray-300 text-gray-700 px-3 py-1 rounded-full text-sm font-bold">
+                                <i class="fas fa-times-circle mr-1"></i> Inactive
+                            </span>
+                        </div>
+
+                        <p class="text-gray-700 mb-4 line-clamp-2" th:text="${mission.description}">Description...</p>
+
+                        <!-- Compétences -->
+                        <div class="mb-3" th:if="${#lists.size(mission.competences) > 0}">
+                            <div class="flex flex-wrap gap-2">
+                                <span th:each="comp : ${mission.competences}" 
+                                      class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs">
+                                    <span th:text="${comp.nom}">Compétence</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="flex items-center space-x-6 text-sm">
+                            <span class="text-green-600 font-bold">
+                                <i class="fas fa-euro-sign mr-1"></i>
+                                <span th:text="${#numbers.formatDecimal(mission.budget, 0, 'COMMA', 2, 'POINT')}">5000</span> €
+                            </span>
+                            <span class="text-gray-600">
+                                <i class="fas fa-paper-plane mr-1"></i>
+                                <span th:text="${#lists.size(mission.candidatures)}">0</span> candidature(s)
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="ml-6 flex flex-col space-y-2">
+                        <form th:if="${mission.active}" 
+                              th:action="@{/admin/mission/{id}/desactiver(id=${mission.id})}" method="post">
+                            <button type="submit" 
+                                    class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-4 py-2 rounded-lg transition w-full">
+                                <i class="fas fa-pause mr-1"></i> Désactiver
+                            </button>
+                        </form>
+
+                        <form th:action="@{/admin/mission/{id}/supprimer(id=${mission.id})}" method="post" 
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette mission ?');">
+                            <button type="submit" 
+                                    class="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg transition w-full">
+                                <i class="fas fa-trash mr-1"></i> Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 text-center">
+            <p class="text-gray-600">
+                <i class="fas fa-info-circle mr-2"></i>
+                Total : <span class="font-bold" th:text="${#lists.size(missions)}">0</span> mission(s) active(s)
+            </p>
+        </div>
+    </main>
+</body>
+</html>

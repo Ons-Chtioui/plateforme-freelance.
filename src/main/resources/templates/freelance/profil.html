@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Mon Profil</title>
+</head>
+<body>
+    <main>
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">
+                <i class="fas fa-user-circle text-indigo-600 mr-3"></i>
+                Mon Profil
+            </h1>
+            <p class="text-gray-600 mt-2">Gérez vos informations personnelles et professionnelles</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Colonne gauche : Photo et CV -->
+            <div class="space-y-6">
+                <!-- Photo de profil -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                        <i class="fas fa-camera mr-2 text-indigo-600"></i>
+                        Photo de profil
+                    </h3>
+                    
+                    <div class="text-center">
+                        <div th:if="${profil.photoProfil != null}" class="w-40 h-40 mx-auto rounded-full overflow-hidden border-4 border-indigo-100 mb-4">
+                            <img th:src="@{'/uploads/photos/' + ${profil.photoProfil}}" alt="Photo" class="w-full h-full object-cover">
+                        </div>
+                        <div th:unless="${profil.photoProfil != null}" class="w-40 h-40 mx-auto rounded-full bg-indigo-100 flex items-center justify-center mb-4">
+                            <i class="fas fa-user text-indigo-600 text-6xl"></i>
+                        </div>
+
+                        <form th:action="@{/freelance/profil/upload-photo}" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="profilId" th:value="${profil.id}">
+                            <input type="file" name="photo" accept="image/*" required
+                                   class="block w-full text-sm text-gray-600 mb-3
+                                          file:mr-4 file:py-2 file:px-4
+                                          file:rounded-lg file:border-0
+                                          file:text-sm file:font-semibold
+                                          file:bg-indigo-50 file:text-indigo-700
+                                          hover:file:bg-indigo-100">
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition">
+                                <i class="fas fa-upload mr-2"></i> Télécharger
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- CV PDF -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                        <i class="fas fa-file-pdf mr-2 text-red-600"></i>
+                        Mon CV
+                    </h3>
+                    
+                    <div class="text-center">
+                        <div th:if="${profil.cvPdf != null}" class="mb-4">
+                            <div class="bg-red-50 p-4 rounded-lg mb-3">
+                                <i class="fas fa-file-pdf text-red-600 text-4xl mb-2"></i>
+                                <p class="text-sm text-gray-700 font-medium">CV actuel</p>
+                            </div>
+                            <a th:href="@{'/uploads/cv/' + ${profil.cvPdf}}" target="_blank"
+                               class="inline-block bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg transition mb-3">
+                                <i class="fas fa-eye mr-2"></i> Voir mon CV
+                            </a>
+                        </div>
+                        <div th:unless="${profil.cvPdf != null}" class="mb-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <i class="fas fa-file-pdf text-gray-400 text-4xl mb-2"></i>
+                                <p class="text-sm text-gray-600">Aucun CV téléchargé</p>
+                            </div>
+                        </div>
+
+                        <form th:action="@{/freelance/profil/upload-cv}" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="profilId" th:value="${profil.id}">
+                            <input type="file" name="cv" accept=".pdf" required
+                                   class="block w-full text-sm text-gray-600 mb-3
+                                          file:mr-4 file:py-2 file:px-4
+                                          file:rounded-lg file:border-0
+                                          file:text-sm file:font-semibold
+                                          file:bg-red-50 file:text-red-700
+                                          hover:file:bg-red-100">
+                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition">
+                                <i class="fas fa-upload mr-2"></i> Télécharger
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne droite : Informations personnelles -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-6">
+                        <i class="fas fa-info-circle mr-2 text-indigo-600"></i>
+                        Informations personnelles
+                    </h3>
+
+                    <form th:action="@{/freelance/profil/update}" method="post" class="space-y-6">
+                        <input type="hidden" name="profilId" th:value="${profil.id}">
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Prénom</label>
+                                <input type="text" name="prenom" th:value="${profil.prenom}" required
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Nom</label>
+                                <input type="text" name="nom" th:value="${profil.nom}" required
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">
+                                <i class="fas fa-phone mr-2"></i> Téléphone
+                            </label>
+                            <input type="tel" name="telephone" th:value="${profil.telephone}"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                   placeholder="+33 6 12 34 56 78">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">
+                                <i class="fas fa-envelope mr-2"></i> Email (lecture seule)
+                            </label>
+                            <input type="email" th:value="${profil.utilisateur.email}" disabled
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">
+                                <i class="fas fa-comment mr-2"></i> Biographie
+                            </label>
+                            <textarea name="biographie" rows="4" th:text="${profil.biographie}"
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                      placeholder="Parlez de votre expérience, vos compétences, vos réalisations..."></textarea>
+                        </div>
+
+                        <!-- Sélection des compétences -->
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-3">
+                                <i class="fas fa-code mr-2"></i> Mes compétences
+                            </label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-64 overflow-y-auto p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                <label th:each="comp : ${competences}" class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="checkbox" name="competenceIds" th:value="${comp.id}"
+                                           th:checked="${#lists.contains(profil.competences, comp)}"
+                                           class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <span class="text-gray-700 text-sm" th:text="${comp.nom}">Compétence</span>
+                                </label>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Sélectionnez vos compétences pour améliorer le matching avec les missions
+                            </p>
+                        </div>
+
+                        <div class="flex justify-end space-x-3 pt-4 border-t">
+                            <a th:href="@{/freelance/dashboard}" 
+                               class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-lg transition">
+                                <i class="fas fa-times mr-2"></i> Annuler
+                            </a>
+                            <button type="submit" 
+                                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg transition">
+                                <i class="fas fa-save mr-2"></i> Enregistrer les modifications
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail Freelance - FreelanceHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a th:href="@{/admin/freelances}" class="text-indigo-600 hover:text-indigo-800">
+                        <i class="fas fa-arrow-left mr-2"></i> Retour à la liste
+                    </a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-gray-600" th:text="${utilisateur.email}">admin@example.com</span>
+                    <a th:href="@{/logout}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Déconnexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <div class="flex items-start space-x-6 mb-8">
+                <!-- Photo -->
+                <div class="flex-shrink-0">
+                    <div th:if="${profil.photoProfil != null}" 
+                         class="w-32 h-32 rounded-full overflow-hidden border-4 border-indigo-100">
+                        <img th:src="@{'/uploads/photos/' + ${profil.photoProfil}}" 
+                             alt="Photo" class="w-full h-full object-cover">
+                    </div>
+                    <div th:unless="${profil.photoProfil != null}" 
+                         class="w-32 h-32 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <i class="fas fa-user text-indigo-600 text-6xl"></i>
+                    </div>
+                </div>
+
+                <!-- Informations principales -->
+                <div class="flex-1">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2" th:text="${profil.nomComplet}">Nom Prénom</h1>
+                    <p class="text-gray-600 mb-2">
+                        <i class="fas fa-envelope mr-2"></i>
+                        <span th:text="${profil.utilisateur.email}">email@example.com</span>
+                    </p>
+                    <p class="text-gray-600 mb-4" th:if="${profil.telephone != null}">
+                        <i class="fas fa-phone mr-2"></i>
+                        <span th:text="${profil.telephone}">Téléphone</span>
+                    </p>
+
+                    <span class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-bold inline-flex items-center">
+                        <i class="fas fa-laptop-code mr-2"></i> FREELANCE
+                    </span>
+                </div>
+            </div>
+
+            <!-- Biographie -->
+            <div class="mb-8" th:if="${profil.biographie != null}">
+                <h2 class="text-xl font-bold text-gray-900 mb-3">
+                    <i class="fas fa-user-tie text-indigo-600 mr-2"></i>
+                    À propos
+                </h2>
+                <p class="text-gray-700 whitespace-pre-line" th:text="${profil.biographie}">Biographie...</p>
+            </div>
+
+            <!-- Compétences -->
+            <div class="mb-8" th:if="${#lists.size(profil.competences) > 0}">
+                <h2 class="text-xl font-bold text-gray-900 mb-3">
+                    <i class="fas fa-code text-indigo-600 mr-2"></i>
+                    Compétences
+                </h2>
+                <div class="flex flex-wrap gap-2">
+                    <span th:each="comp : ${profil.competences}" 
+                          class="bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full font-medium">
+                        <i class="fas fa-tag mr-1"></i>
+                        <span th:text="${comp.nom}">Compétence</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- CV -->
+            <div class="mb-8" th:if="${profil.cvPdf != null}">
+                <h2 class="text-xl font-bold text-gray-900 mb-3">
+                    <i class="fas fa-file-pdf text-red-600 mr-2"></i>
+                    Curriculum Vitae
+                </h2>
+                <a th:href="@{'/uploads/cv/' + ${profil.cvPdf}}" target="_blank"
+                   class="inline-flex items-center bg-red-100 hover:bg-red-200 text-red-700 px-6 py-3 rounded-lg font-medium transition">
+                    <i class="fas fa-download mr-2"></i> Télécharger le CV
+                </a>
+            </div>
+
+            <!-- Statistiques candidatures -->
+            <div class="border-t pt-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-chart-bar text-indigo-600 mr-2"></i>
+                    Statistiques
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-yellow-50 rounded-lg p-4 text-center">
+                        <p class="text-3xl font-bold text-yellow-800" th:text="${#lists.size(profil.candidatures)}">0</p>
+                        <p class="text-sm text-yellow-700 mt-1">Total candidatures</p>
+                    </div>
+                    <div class="bg-green-50 rounded-lg p-4 text-center">
+                        <p class="text-3xl font-bold text-green-800" th:text="${#lists.size(profil.candidatures.?[statut.name() == 'ACCEPTEE'])}">0</p>
+                        <p class="text-sm text-green-700 mt-1">Candidatures acceptées</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4 text-center">
+                        <p class="text-3xl font-bold text-gray-800" th:text="${#lists.size(profil.competences)}">0</p>
+                        <p class="text-sm text-gray-700 mt-1">Compétences</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
